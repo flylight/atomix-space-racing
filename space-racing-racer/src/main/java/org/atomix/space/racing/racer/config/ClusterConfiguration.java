@@ -1,4 +1,4 @@
-package org.atomix.space.racing.galaxy.config;
+package org.atomix.space.racing.racer.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,8 +13,8 @@ public class ClusterConfiguration {
   public Atomix atomixInstance() {
 
     Atomix atomix = Atomix.builder()
-        .withMemberId("galaxy")
-        .withAddress("localhost", 8081)
+        .withMemberId("racer")
+        .withAddress("localhost", 8082)
         .withMulticastEnabled()
         .withProfiles(Profile.dataGrid())
         .build();

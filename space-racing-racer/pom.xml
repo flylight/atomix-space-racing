@@ -3,13 +3,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>space-racing-galaxy</artifactId>
+  <artifactId>space-racing-racer</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>space-racing-galaxy</name>
-  <description>Part of Distributed Application made for Devoxx Ukraine. Component represent galaxy where will be
-    racing.
+  <name>space-racing-racer</name>
+  <description>Part of distributed application made for Devoxx Ukraine Demo. Represent a racer who will participate in
+    race.
   </description>
 
   <parent>
