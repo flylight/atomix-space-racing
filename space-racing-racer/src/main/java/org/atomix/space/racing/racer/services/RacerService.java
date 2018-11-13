@@ -21,8 +21,8 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class RacerService {
 
-  private static final int MAX_RACER_STEP = 100;
-  private static final int DELAY_IN_SECONDS = 1;
+  private static final int MAX_RACER_STEP = 3;
+  private static final int DELAY_IN_SECONDS = 10;
 
   private final AsyncAtomicValue<Boolean> remoteRaceStatus;
   private final AsyncAtomicMap<String, Integer> remoteRaceState;
@@ -39,7 +39,8 @@ public class RacerService {
 
     remoteRaceStatus.addListener(event -> startOrStopRace(event.newValue()));
 
-    remoteRaceState.put(racerName, 0).whenComplete((integerVersioned, throwable) -> log.info("Racer {} registered!", racerName));
+    remoteRaceState.put(racerName, 0)
+        .whenComplete((integerVersioned, throwable) -> log.info("Racer {} registered!", racerName));
   }
 
   private void startOrStopRace(boolean raceStatus) {
@@ -66,22 +67,24 @@ public class RacerService {
     if (!localRaceStatus.get()) {
       log.info("Racer {} started!", racerName);
 
+      localRaceStatus.set(true);
+
       scheduleNextStep();
     }
   }
 
   private void scheduleNextStep() {
-    engine.schedule(this::doNextStep, DELAY_IN_SECONDS, TimeUnit.SECONDS);
+    engine.schedule(this::doNextStep, DELAY_IN_SECONDS, TimeUnit.MILLISECONDS);
   }
 
   private void doNextStep() {
     remoteRaceState.get(racerName).whenComplete((integerVersioned, throwable) -> {
 
-      int nextRaceProgress = integerVersioned.value() + random.nextInt(MAX_RACER_STEP);
+      int updatedRaceState = integerVersioned.value() + random.nextInt(MAX_RACER_STEP);
 
-      log.info("Race progress: {}", nextRaceProgress);
+      log.info("Race state: {}", updatedRaceState);
 
-      remoteRaceState.put(racerName, nextRaceProgress).whenComplete((integerVersioned1, throwable1) -> log.info("Progress updated!"));
+      remoteRaceState.put(racerName, updatedRaceState).whenComplete((integerVersioned1, throwable1) -> log.info("Racer state updated!"));
 
       if (localRaceStatus.get()) {
         scheduleNextStep();

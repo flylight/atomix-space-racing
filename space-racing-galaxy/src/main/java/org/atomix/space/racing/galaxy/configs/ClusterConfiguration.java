@@ -6,9 +6,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import io.atomix.core.Atomix;
-import io.atomix.core.map.AsyncAtomicMap;
+import io.atomix.core.map.AtomicMap;
 import io.atomix.core.profile.Profile;
-import io.atomix.core.value.AsyncAtomicValue;
+import io.atomix.core.value.AtomicValue;
 
 @Configuration
 public class ClusterConfiguration {
@@ -21,7 +21,7 @@ public class ClusterConfiguration {
         .withMemberId(galaxyName)
         .withAddress("localhost", galaxyPort)
         .withMulticastEnabled()
-        .withProfiles(Profile.dataGrid())
+        .withProfiles(Profile.dataGrid(1))
         .build();
 
     atomix.start().join();
@@ -30,21 +30,19 @@ public class ClusterConfiguration {
   }
 
   @Bean
-  public AsyncAtomicValue<Boolean> initializeRaceStatusFlag(@Autowired Atomix atomix,
-                                                            @Value("${race.status.variable.name}") String raceStatusVarName) {
+  public AtomicValue<Boolean> initializeRaceStatusFlag(@Autowired Atomix atomix,
+                                                       @Value("${race.status.variable.name}") String raceStatusVarName) {
 
     return atomix.<Boolean>atomicValueBuilder(raceStatusVarName)
-        .build()
-        .async();
+        .build();
   }
 
   @Bean
-  public AsyncAtomicMap<String, Integer> initializeRaceState(@Autowired Atomix atomix,
-                                                             @Value("${race.state.variable.name") String raceStateVarName) {
+  public AtomicMap<String, Integer> initializeRaceState(@Autowired Atomix atomix,
+                                                        @Value("${race.state.variable.name}") String raceStateVarName) {
 
     return atomix.<String, Integer>atomicMapBuilder(raceStateVarName)
-        .build()
-        .async();
+        .build();
   }
 
 }

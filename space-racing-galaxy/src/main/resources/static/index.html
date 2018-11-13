@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Atomix - Distributed Fight!</title>
+
+  <link rel="stylesheet" type="text/css" href="css/main.css">
+  <link rel="stylesheet" type="text/css" href="css/finishLine.css">
+
+  <script src="js/jquery-3.3.1.min.js"></script>
+</head>
+<body style="text-align: center;">
+
+<div style="z-index: 5; position: relative; color: white; font-family: monospace; text-align: center;">
+  <h1>Atomix - Galaxy Race! [Devoxx UA 2018]</h1>
+</div>
+
+<div style="z-index: 7; position: relative; color: white; font-family: monospace; padding-top: 20px;">
+  <hr class="finishLine">
+</div>
+
+<div style="z-index: 6; position: relative; text-align: center; padding-top: 30px;">
+
+  <img id="start-btn" src="img/start.png" width="256" height="256" onclick="start();" style="cursor: pointer;" hidden/>
+
+  <span id="infoLabel" style="font-size: 300px; color: white; font-family: monospace;"></span>
+
+  <br/>
+
+  <img id="reset-btn" src="img/reset.png" style="cursor: pointer;" onclick="resetRace();" hidden/>
+
+</div>
+
+<div class="stars"></div>
+<div class="twinkling"></div>
+<div class="clouds"></div>
+
+<script>
+    var music = new Audio("music.mp3");
+    var count = 0;
+    var raceStarted = false;
+    var gameOver = false;
+
+    $(function () {
+        initializeState();
+    });
+
+    function start() {
+        $("#start-btn").hide();
+
+        music.play();
+
+        setInterval("countdown()", 750);
+    }
+
+    function countdown() {
+        if (!raceStarted && !gameOver) {
+            if (count >= 5) {
+
+                raceStarted = true;
+
+                $("#infoLabel").fadeToggle(1000);
+
+                startRace();
+
+                setInterval("updateState()", 50);
+            } else {
+
+                count++;
+
+                if (count > 4) {
+
+                    $("#infoLabel").html("GO!");
+                } else {
+
+                    $("#infoLabel").html(count);
+                }
+            }
+        }
+    }
+
+    function startRace() {
+        $.post('galaxy/race/start', function (data) {
+        });
+    }
+
+    function stopRace() {
+        $.post('galaxy/race/stop', function (data) {
+        });
+    }
+
+    function resetRace() {
+        $.post('galaxy/race/reset', function (data) {
+            window.location.reload();
+        });
+    }
+
+    function updateState() {
+        $.get('galaxy/race/state', function (data) {
+            for (var racerName in data) {
+                if (data.hasOwnProperty(racerName)) {
+
+                    var nextPosition = data[racerName] + 20;
+
+                    $("#" + racerName.replace(/\s/g, '')).css({"bottom": data[racerName] + 20});
+
+                    if (nextPosition >= $(window).height() - 140 && !gameOver) {
+                        stopRace();
+
+                        music.pause();
+
+                        $("#reset-btn").show();
+
+                        $("#infoLabel").show();
+                        $("#infoLabel").css({"font-size": "150px"});
+                        $("#infoLabel").html(racerName + "\nWON!");
+
+                        gameOver = true;
+                        raceStarted = false;
+                    }
+                }
+            }
+        });
+    }
+
+    function initializeState() {
+
+        $.get('galaxy/race/state', function (data) {
+            var count = Object.keys(data).length;
+
+            var racerCount = ($(window).width()/2) - (75 * count);
+
+            if (count > 0) {
+                $("#start-btn").show();
+            }
+
+            var index = 1;
+
+            for (var racerName in data) {
+
+                if (data.hasOwnProperty(racerName)) {
+
+                    $("body").append(buildRacer(racerName, racerCount, index));
+
+                    racerCount += 120;
+
+                    index = index > 3 ? 1 : index+1;
+                }
+            }
+
+        });
+    }
+
+    function buildRacer(name, position, index) {
+
+        return "<div id=\"" + name.replace(/\s/g, '')
+               + "\" style=\"z-index: 6; position: fixed; bottom: 20px; padding-left: "
+               + position + "px;\">\n"
+               + "  <img src=\"img/spacecraft-" + index + ".png\" style=\"padding-left: 30px;\"/>\n"
+               + "  <span style=\"color: white; position: inherit; margin-left: -20px; font-family: monospace;\">"
+               + name + "</span>\n"
+               + "</div>";
+    }
+
+</script>
+
+</body>
+</html>

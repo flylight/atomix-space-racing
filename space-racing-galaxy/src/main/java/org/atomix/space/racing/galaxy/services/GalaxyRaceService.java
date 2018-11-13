@@ -1,26 +1,47 @@
 package org.atomix.space.racing.galaxy.services;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import io.atomix.core.map.AsyncAtomicMap;
-import io.atomix.core.map.AtomicMap;
-import io.atomix.core.value.AsyncAtomicValue;
-import lombok.AllArgsConstructor;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+import io.atomix.core.map.AtomicMap;
+import io.atomix.core.value.AtomicValue;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class GalaxyRaceService {
 
-  private final AsyncAtomicValue<Boolean> raceStatus;
+  private final AtomicValue<Boolean> raceStatus;
 
-  private final AsyncAtomicMap<String, Integer> raceState;
+  private final AtomicMap<String, Integer> raceState;
 
-  public AtomicMap<String, Integer> getRaceState() {
-    return raceState.sync();
-//    Map<String, Integer> state = new HashMap<>();
-//
-//    raceState.entrySet().forEach(entry -> state.put(entry.getKey(), entry.getValue().value()));
-//
-//    return state;
+
+  @Value("${race.state.variable.name")
+  private String raceStateVarName;
+
+
+  public Map<String, Integer> getRaceState() {
+
+    return raceState.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, o -> o.getValue().value()));
+  }
+
+  public void startRace() {
+
+    raceStatus.set(true);
+  }
+
+  public void stopRace() {
+
+    raceStatus.set(false);
+  }
+
+  public void resetRace() {
+
+    raceState.keySet().forEach(racerName -> raceState.put(racerName, 0));
   }
 }
