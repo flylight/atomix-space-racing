@@ -19,7 +19,7 @@
   <hr class="finishLine">
 </div>
 
-<div style="z-index: 6; position: relative; text-align: center; padding-top: 30px;">
+<div style="z-index: 8; position: relative; text-align: center; padding-top: 100px;">
 
   <img id="start-btn" src="img/start.png" width="256" height="256" onclick="start();" style="cursor: pointer;" hidden/>
 
@@ -113,7 +113,7 @@
 
                         $("#infoLabel").show();
                         $("#infoLabel").css({"font-size": "150px"});
-                        $("#infoLabel").html(racerName + "\nWON!");
+                        $("#infoLabel").html(racerName + "\nWINS!");
 
                         gameOver = true;
                         raceStarted = false;
@@ -156,7 +156,7 @@
         return "<div id=\"" + name.replace(/\s/g, '')
                + "\" style=\"z-index: 6; position: fixed; bottom: 20px; padding-left: "
                + position + "px;\">\n"
-               + "  <img src=\"img/spacecraft-" + index + ".png\" style=\"padding-left: 30px;\"/>\n"
+               + "  <img src=\"img/spacecraft-" + index + ".png\" style=\"padding-left: 40px;\"/>\n"
                + "  <span style=\"color: white; position: inherit; margin-left: -20px; font-family: monospace;\">"
                + name + "</span>\n"
                + "</div>";

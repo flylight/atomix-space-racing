@@ -20,14 +20,13 @@ public class GalaxyRaceService {
 
   private final AtomicMap<String, Integer> raceState;
 
-
   @Value("${race.state.variable.name")
   private String raceStateVarName;
 
-
   public Map<String, Integer> getRaceState() {
 
-    return raceState.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, o -> o.getValue().value()));
+    return raceState.entrySet().stream()
+        .collect(Collectors.toMap(Map.Entry::getKey, o -> o.getValue().value()));
   }
 
   public void startRace() {
